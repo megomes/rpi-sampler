@@ -1,0 +1,41 @@
+# Project specific
+CLAUDE.md
+spec/
+
+# Build artifacts
+*.o
+*.a
+*.so
+sampler
+*.exe
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Compiler generated
+*.d
+*.dep
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Configuration backups
+*.bak
+*.orig
+
+# OS generated files
+Thumbs.db
+.directory
