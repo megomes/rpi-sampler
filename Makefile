@@ -1,9 +1,13 @@
 # Raspberry Pi MIDI Sampler - Makefile
-# Basic Hello World build configuration
+# Professional build configuration
+
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
 
 # Compiler settings
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -std=c99
+CFLAGS = -Wall -Wextra -O2 -std=c99 -I$(SRC_DIR)
 LIBS = -lasound
 
 # For cross-compilation to Raspberry Pi (uncomment if needed)
@@ -15,31 +19,35 @@ TARGET = sampler
 MIDI_SCANNER = list_midi
 
 # Source files
-SOURCES = main.c
-MIDI_SOURCES = list_midi.c
+SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/midi.c
+MIDI_SOURCES = $(SRC_DIR)/list_midi.c
 
 # Object files
-OBJECTS = $(SOURCES:.c=.o)
-MIDI_OBJECTS = $(MIDI_SOURCES:.c=.o)
+OBJECTS = $(BUILD_DIR)/main.o $(BUILD_DIR)/midi.o
+MIDI_OBJECTS = $(BUILD_DIR)/list_midi.o
 
 # Default target
-all: $(TARGET) $(MIDI_SCANNER)
+all: $(BUILD_DIR) $(TARGET) $(MIDI_SCANNER)
+
+# Create build directory
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 # Build the main executable
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $(TARGET)
+	$(CC) $(OBJECTS) $(LIBS) -o $(TARGET)
 
 # Build the MIDI scanner utility
 $(MIDI_SCANNER): $(MIDI_OBJECTS)
 	$(CC) $(MIDI_OBJECTS) $(LIBS) -o $(MIDI_SCANNER)
 
 # Compile source files to object files
-%.o: %.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean build artifacts
 clean:
-	rm -f $(OBJECTS) $(MIDI_OBJECTS) $(TARGET) $(MIDI_SCANNER)
+	rm -rf $(BUILD_DIR) $(TARGET) $(MIDI_SCANNER)
 
 # Install to system (for future use)
 install: $(TARGET)
@@ -53,6 +61,6 @@ uninstall:
 rebuild: clean all
 
 # Build only MIDI scanner
-midi: $(MIDI_SCANNER)
+midi: $(BUILD_DIR) $(MIDI_SCANNER)
 
 .PHONY: all clean install uninstall rebuild midi

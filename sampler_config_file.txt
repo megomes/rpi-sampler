@@ -1,0 +1,71 @@
+# Raspberry Pi MIDI Sampler Configuration
+# Edit this file to configure your sampler settings
+
+[AUDIO]
+# Audio interface settings
+sample_rate = 44100          # Sample rate: 44100 or 48000
+buffer_size = 128            # Buffer size: 64, 128, 256, 512
+bit_depth = 16               # Bit depth: 16 or 24
+audio_device = hw:1,0        # ALSA audio device (hw:X,Y)
+                            # Use 'aplay -l' to list available devices
+                            # hw:0,0 = built-in audio
+                            # hw:1,0 = first USB audio interface
+
+[MIDI]
+# MIDI interface settings
+midi_device = hw:2,0,0       # ALSA MIDI device (hw:X,Y,Z)
+                            # Use 'amidi -l' to list available devices
+                            # hw:2,0,0 = first USB MIDI interface
+channel_1 = 1               # MIDI channel for sampler 1 (1-16)
+channel_2 = 2               # MIDI channel for sampler 2 (1-16)
+
+[SAMPLES]
+# Sample library settings
+sample_folder = /home/pi/samples/
+auto_scan = true                     # Automatically scan folder for .wav files
+max_samples = 42                     # Maximum samples to load (first 42 in alphabetical order)
+supported_formats = wav,aiff         # Supported audio formats
+max_polyphony_per_channel = 8        # Max voices per channel (6-8 recommended)
+
+[PERFORMANCE]
+# Performance and latency settings
+cpu_governor = performance    # CPU governor: performance, ondemand, powersave
+process_priority = 99        # Real-time priority (1-99, higher = more priority)
+lock_memory = true           # Lock audio buffers in RAM
+disable_swap = true          # Disable swap for real-time performance
+
+[GPIO]
+# GPIO LED status indicator
+status_led_pin = 18          # GPIO pin for status LED
+led_brightness = 50          # LED brightness (0-100%)
+
+[EFFECTS]
+# Default effect settings (can be overridden via MIDI CC)
+# Channel 1 defaults
+ch1_attack_ms = 10           # Default attack time in milliseconds
+ch1_release_ms = 500         # Default release time in milliseconds
+ch1_filter_cutoff = 127      # Default filter cutoff (0-127)
+ch1_bitcrush = 0             # Default bit crush amount (0-127)
+ch1_pitch_bend = 64          # Default pitch bend (64 = no bend)
+ch1_sample_start = 0         # Default sample start point (0-127)
+ch1_sample_end = 127         # Default sample end point (0-127)
+
+# Channel 2 defaults
+ch2_attack_ms = 10           # Default attack time in milliseconds
+ch2_release_ms = 500         # Default release time in milliseconds
+ch2_filter_cutoff = 127      # Default filter cutoff (0-127)
+ch2_bitcrush = 0             # Default bit crush amount (0-127)
+ch2_pitch_bend = 64          # Default pitch bend (64 = no bend)
+ch2_sample_start = 0         # Default sample start point (0-127)
+ch2_sample_end = 127         # Default sample end point (0-127)
+
+[SYSTEM]
+# System optimization settings
+boot_delay_ms = 1000         # Delay before starting sampler (allow system to settle)
+sample_loading_timeout_ms = 1000    # Timeout for sample loading
+error_recovery = true        # Enable automatic error recovery
+debug_mode = false           # Enable debug logging (may affect performance)
+
+# Auto-start configuration
+auto_start = true            # Start sampler automatically on boot
+service_name = pi-sampler    # SystemD service name

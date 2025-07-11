@@ -3,10 +3,9 @@ CLAUDE.md
 spec/
 
 # Build artifacts
-*.o
-*.a
-*.so
+build/
 sampler
+list_midi
 *.exe
 
 # Debug files
