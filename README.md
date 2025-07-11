@@ -16,11 +16,27 @@ make
 - USB MIDI Interface
 - High-speed SD card (Class 10+)
 
+## Installation & Auto-Start
+
+The `install.sh` script automatically sets up the sampler to run on boot:
+
+```bash
+./install.sh
+```
+
+**What it does:**
+- Builds the sampler executable
+- Creates `~/samples/` directory for your audio files
+- Installs SystemD service for auto-start on boot
+- Configures real-time audio priority settings
+
+**Run as your regular user** (not root) - the script adapts to any username.
+
 ## Configuration
 
-Edit `sampler_config_file.txt` for audio/MIDI settings.
+Place samples in `~/samples/` directory (WAV format).
 
-Place samples in `/home/pi/samples/` directory (WAV format).
+Edit `sampler_config_file.txt` for audio/MIDI settings.
 
 ## Features
 
@@ -30,6 +46,13 @@ Place samples in `/home/pi/samples/` directory (WAV format).
 - 42 samples via CC1 control
 - GPIO status LED
 
----
+## Service Management
 
-See `raspberry_pi_sampler_spec.md` for detailed specifications.
+```bash
+sudo systemctl start rpi-sampler-$USER     # Start service
+sudo systemctl stop rpi-sampler-$USER      # Stop service  
+sudo systemctl status rpi-sampler-$USER    # Check status
+sudo journalctl -u rpi-sampler-$USER -f    # View logs
+```
+
+Service name format: `rpi-sampler-{username}` (e.g., `rpi-sampler-john`)
