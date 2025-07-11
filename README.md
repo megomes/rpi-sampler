@@ -2,11 +2,28 @@
 
 Real-time, low-latency MIDI sampler for Raspberry Pi with dual-channel operation.
 
+## Dependencies
+
+First, install required packages on your Raspberry Pi:
+
+```bash
+./setup.sh
+```
+
 ## Quick Start
 
 ```bash
 make
 ./sampler
+```
+
+## MIDI Device Scanner
+
+List connected USB MIDI devices:
+
+```bash
+make midi
+./list_midi
 ```
 
 ## Requirements
@@ -18,7 +35,7 @@ make
 
 ## Installation & Auto-Start
 
-The `install.sh` script automatically sets up the sampler to run on boot:
+After running `setup.sh`, the `install.sh` script sets up the sampler to run on boot:
 
 ```bash
 ./install.sh
