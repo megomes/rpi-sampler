@@ -1,6 +1,7 @@
 # Raspberry Pi MIDI Sampler
 
-Professional real-time MIDI sampler for Raspberry Pi using JACK Audio Connection Kit.
+A real-time MIDI sampler for Raspberry Pi that transforms your Circuit Tracks into a powerful dual-channel chromatic sampler.  
+Uses both MIDI tracks from the Circuit Tracks, mapping each to a separate chromatic sampler and routing them to the left and right audio outputs.
 
 ## Dependencies
 
