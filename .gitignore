@@ -1,6 +1,7 @@
 # Project specific
 CLAUDE.md
 spec/
+samples/
 
 # Build artifacts
 build/

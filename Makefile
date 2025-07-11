@@ -8,7 +8,7 @@ BUILD_DIR = build
 # Compiler settings
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -I$(SRC_DIR)
-LIBS = -lasound
+LIBS = -ljack -lasound -lsndfile -lpthread -lm
 
 # For cross-compilation to Raspberry Pi (uncomment if needed)
 # CC = arm-linux-gnueabihf-gcc
@@ -19,11 +19,11 @@ TARGET = sampler
 MIDI_SCANNER = list_midi
 
 # Source files
-SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/midi.c
+SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/midi.c $(SRC_DIR)/jack_client.c $(SRC_DIR)/audio_engine.c $(SRC_DIR)/sample_loader.c
 MIDI_SOURCES = $(SRC_DIR)/list_midi.c
 
 # Object files
-OBJECTS = $(BUILD_DIR)/main.o $(BUILD_DIR)/midi.o
+OBJECTS = $(BUILD_DIR)/main.o $(BUILD_DIR)/midi.o $(BUILD_DIR)/jack_client.o $(BUILD_DIR)/audio_engine.o $(BUILD_DIR)/sample_loader.o
 MIDI_OBJECTS = $(BUILD_DIR)/list_midi.o
 
 # Default target

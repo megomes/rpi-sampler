@@ -1,0 +1,83 @@
+# Raspberry Pi MIDI Sampler - JACK Audio Configuration
+# Edit this file to configure the audio engine
+# Restart the sampler after modifying to apply changes
+
+# NOTE: With JACK, sample rate and buffer size are defined by the JACK daemon
+# This sampler uses 48kHz professional standard
+# Command: jackd -dalsa -dhw:0 -r48000 -p1024 -n2
+
+# MASTER GAIN
+# Overall sampler volume (0.1 to 1.0)
+# Lower values prevent clipping but reduce volume
+# 
+# 0.5 = medium volume, safe for multiple voices
+# 0.7 = high volume, may clip with many voices
+# 1.0 = maximum volume, risk of distortion
+#
+# Possible values: 0.1, 0.3, 0.5, 0.7, 0.9, 1.0
+master_gain=0.7
+
+# MAX VOICES
+# Maximum number of samples playing simultaneously
+# More voices = more polyphony, more CPU
+#
+# 4 = basic, for older Pi
+# 8 = standard, good polyphony
+# 16 = maximum, for Pi 4 or higher
+#
+# Possible values: 2, 4, 8, 16
+max_voices=8
+
+# AUTO GAIN CONTROL
+# Automatically reduces volume when many voices play together
+# Prevents distortion in large chords
+#
+# 1 = enabled (recommended)
+# 0 = disabled (fixed volume)
+#
+# Possible values: 0, 1
+auto_gain_control=1
+
+# JACK CLIENT NAME
+# JACK client name (appears in connections)
+# Use unique names if running multiple instances
+#
+# Default: "rpi-sampler"
+jack_client_name=rpi-sampler
+
+# AUTO CONNECT
+# Automatically connects to system outputs
+# 1 = auto-connect (recommended)
+# 0 = manual connection required
+#
+# Possible values: 0, 1
+auto_connect=1
+
+# OUTPUT CHANNELS
+# Number of output channels
+# 1 = mono, 2 = stereo
+#
+# Possible values: 1, 2
+output_channels=2
+
+# JACK CONFIGURATIONS:
+#
+# === RASPBERRY PI P2 (3.5mm output) ===
+# jackd -dalsa -dhw:0 -r48000 -p1024 -n2
+# master_gain=0.7
+# max_voices=8
+#
+# === USB INTERFACE ===
+# jackd -dalsa -dhw:1 -r48000 -p512 -n2
+# master_gain=0.8
+# max_voices=16
+#
+# === LOW LATENCY ===
+# jackd -dalsa -dhw:0 -r48000 -p256 -n2
+# master_gain=0.6
+# max_voices=4
+#
+# === HIGH QUALITY ===
+# jackd -dalsa -dhw:1 -r48000 -p2048 -n3
+# master_gain=0.9
+# max_voices=16

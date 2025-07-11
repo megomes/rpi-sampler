@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <signal.h>
 #include "midi.h"
+#include "jack_client.h"
+#include "audio_engine.h"
+#include "sample_loader.h"
 
 static int running = 1;
 
@@ -16,8 +19,18 @@ void signal_handler(int sig) {
 // MIDI event callback functions
 void on_midi_note(midi_note_event_t *event) {
     if (event->is_note_on) {
-        printf("Note ON:  Channel=%d, Note=%d, Velocity=%d\n",
+        printf("Note ON:  Channel=%d, Note=%d, Velocity=%d -> Playing sample\n",
                event->channel, event->note, event->velocity);
+        
+        // Play the loaded sample
+        audio_sample_t *sample = sample_loader_get_first_sample();
+        if (sample) {
+            if (audio_engine_play_sample(sample) < 0) {
+                printf("Error playing sample\n");
+            }
+        } else {
+            printf("No sample loaded to play\n");
+        }
     } else {
         printf("Note OFF: Channel=%d, Note=%d\n",
                event->channel, event->note);
@@ -63,15 +76,57 @@ void on_midi_continue(void) {
 
 
 int main(void) {
-    printf("Raspberry Pi MIDI Sampler - Real-time MIDI Monitor\n");
-    printf("==================================================\n");
+    printf("Raspberry Pi MIDI Sampler - JACK Audio System\n");
+    printf("==============================================\n");
     
     // Set up signal handler for graceful shutdown
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
     
+    // Initialize JACK client
+    printf("\nInitializing JACK client...\n");
+    jack_config_t jack_config = jack_get_default_config();
+    if (jack_client_init(&jack_config) < 0) {
+        printf("Failed to initialize JACK client\n");
+        printf("Make sure JACK is running: jackd -dalsa -dhw:0 -r48000 -p1024 -n2\n");
+        return 1;
+    }
+    
+    // Initialize audio engine
+    printf("\nInitializing audio engine...\n");
+    audio_engine_config_t engine_config = audio_engine_get_default_config();
+    if (audio_engine_init(&engine_config) < 0) {
+        printf("Failed to initialize audio engine\n");
+        jack_client_cleanup();
+        return 1;
+    }
+    
+    // Connect audio engine to JACK
+    jack_client_set_process_callback(audio_engine_process, NULL);
+    jack_client_set_shutdown_callback(audio_engine_shutdown, NULL);
+    
+    // Initialize sample loader
+    printf("\nInitializing sample loader...\n");
+    char samples_path[256];
+    snprintf(samples_path, sizeof(samples_path), "%s/samples", getenv("HOME"));
+    
+    if (sample_loader_init(samples_path) < 0) {
+        printf("Failed to initialize sample loader\n");
+        audio_engine_cleanup();
+        jack_client_cleanup();
+        return 1;
+    }
+    
+    // Show loaded sample information
+    printf("\nSample information:\n");
+    sample_loader_list_samples();
+    
     // Initialize MIDI system
+    printf("\nInitializing MIDI system...\n");
     if (midi_init() < 0) {
+        sample_loader_cleanup();
+        audio_engine_cleanup();
+        jack_client_cleanup();
         return 1;
     }
     
@@ -86,9 +141,26 @@ int main(void) {
     midi_set_stop_callback(on_midi_stop);
     midi_set_continue_callback(on_midi_continue);
     
-    printf("\nConnected to: %s\n", midi_get_connected_device_name());
-    printf("Monitoring MIDI input (Press Ctrl+C to stop)...\n");
-    printf("-----------------------------------------------\n");
+    // Activate JACK client (start audio processing)
+    printf("\nActivating JACK client...\n");
+    if (jack_client_activate() < 0) {
+        printf("Failed to activate JACK client\n");
+        midi_cleanup();
+        sample_loader_cleanup();
+        audio_engine_cleanup();
+        jack_client_cleanup();
+        return 1;
+    }
+    
+    printf("\nSystem ready!\n");
+    printf("Connected to MIDI: %s\n", midi_get_connected_device_name());
+    printf("Loaded sample: %s\n", sample_loader_get_first_sample_name());
+    printf("JACK client: %s (%d Hz, %d frames)\n", 
+           jack_client_get_name(), jack_client_get_sample_rate(), jack_client_get_buffer_size());
+    printf("\nJACK connections:\n");
+    jack_client_print_connections();
+    printf("\nPress keys on MIDI device to trigger samples (Ctrl+C to stop)...\n");
+    printf("================================================================\n");
     
     // Main real-time loop
     while (running) {
@@ -101,8 +173,12 @@ int main(void) {
     }
     
     // Cleanup
+    printf("\nShutting down systems...\n");
     midi_cleanup();
-    printf("MIDI monitor stopped.\n");
+    sample_loader_cleanup();
+    audio_engine_cleanup();
+    jack_client_cleanup();
+    printf("Sampler stopped.\n");
     
     return 0;
 }

@@ -3,7 +3,7 @@
 
 [AUDIO]
 # Audio interface settings
-sample_rate = 44100          # Sample rate: 44100 or 48000
+sample_rate = 4800          # Sample rate: 48000
 buffer_size = 128            # Buffer size: 64, 128, 256, 512
 bit_depth = 16               # Bit depth: 16 or 24
 audio_device = hw:1,0        # ALSA audio device (hw:X,Y)

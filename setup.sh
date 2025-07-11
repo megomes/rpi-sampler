@@ -28,17 +28,26 @@ sudo apt update
 echo "Installing development packages..."
 sudo apt install -y \
     build-essential \
-    libasound2-dev \
+    libjack-jackd2-dev \
+    jackd2 \
+    libsndfile1-dev \
     pkg-config
 
 echo ""
 echo "Verifying installations..."
 
 # Check if packages were installed correctly
-if pkg-config --exists alsa; then
-    echo "✓ ALSA development libraries installed successfully"
+if pkg-config --exists jack; then
+    echo "✓ JACK development libraries installed successfully"
 else
-    echo "✗ ALSA installation failed"
+    echo "✗ JACK installation failed"
+    exit 1
+fi
+
+if pkg-config --exists sndfile; then
+    echo "✓ libsndfile development libraries installed successfully"
+else
+    echo "✗ libsndfile installation failed"
     exit 1
 fi
 
@@ -61,7 +70,19 @@ echo "=========================================="
 echo "Setup completed successfully!"
 echo "=========================================="
 echo ""
+echo "Setting up JACK for audio..."
+echo "Adding user to audio group (required for JACK)..."
+sudo usermod -a -G audio $USER
+
+echo ""
+echo "==========================================="
+echo "Setup completed successfully!"
+echo "==========================================="
+echo ""
+echo "IMPORTANT: You need to log out and log back in for audio group changes to take effect."
+echo ""
 echo "Next steps:"
-echo "1. Run './install.sh' to build and install the sampler"
-echo "2. Use 'make midi && ./list_midi' to scan for MIDI devices"
+echo "1. Log out and log back in (for audio group)"
+echo "2. Run './install.sh' to build and install the sampler"
+echo "3. Use 'make midi && ./list_midi' to scan for MIDI devices"
 echo ""
